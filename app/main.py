@@ -1,86 +1,26 @@
-from fastapi import FastAPI, status, HTTPException
-from os import system
-import dotenv
-from pydantic import BaseModel, EmailStr
-from datetime import datetime
-from psycopg2.extras import RealDictCursor
-import psycopg2 as psql
-from typing import List, Optional
-
-# INSERT INTO users(first_name, second_name, last_name, id_number, email, cellphone, password)
-
-class UserCreate(BaseModel):
-    first_name: str
-    second_name: str = None
-    last_name: str
-    id_number: str
-    email: EmailStr
-    cellphone: str
-    password: str
+from fastapi import FastAPI, status, HTTPException, Depends
+from typing import List
+from .database import get_db, engine
+from . import models, schemas, utils
+from sqlalchemy.orm import Session
 
 def cls():
     system("cls")
-
-
-env = dotenv.find_dotenv()
-
-DB_URL = dotenv.get_key(key_to_get="DB_URL", dotenv_path=env)
 
 app = FastAPI()
 
 @app.get("/api/health")
 def health():
-    try:
-        conn = psql.connect(DB_URL)
-        cur = conn.cursor()
-
-    except Exception as e:
-        print(e)
-
-    finally:
-        if conn:
-            print("Closing connection")
-            conn.close()
-    name = "Mshengu Lunika"
-    print(name)
     return {
-        "name": name
+        "health": "OK"
     }
 
-@app.get("/")
-def function():
-    try:
-        conn = psql.connect(DB_URL)
-        cur = conn.cursor()
-
-    except Exception as e:
-        print(e)
-
-    finally:
-        if conn:
-            print("Closing connection")
-            conn.close()
-    return {
-        "message": "index page"
-    }
 
 @app.get("/users")
-def get_users():
-    cls()
-    try:
-        conn = psql.connect(DB_URL)
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM users")
-        users = cur.fetchall()
-        print(users)
-        if not users:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Couldn't retrieve users")
-        return users
-
-    finally:
-        if conn:
-            print("Closing connection")
-            conn.close()
+def get_users(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    if not users:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Users not found')
 
 @app.get("/users/{id}")
 def get_user(id: int):
@@ -97,12 +37,7 @@ def get_user(id: int):
 
 @app.post("/users")
 def create_user(user: UserCreate):
-    try:
-        conn = psql.connect(DB_URL)
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-
-    finally:
-        conn.close()
+    pass
 
 if __name__ == "__main__":
     system("python -m uvicorn main:app --reload --port 8089")

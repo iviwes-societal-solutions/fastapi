@@ -9,7 +9,7 @@ DB_URL = os.getenv("DB_URL")
 
 engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=engine)
-Base = declarative_base
+Base = declarative_base()
 
 def get_db():
     with SessionLocal() as db:

@@ -8,3 +8,4 @@ class User(Base):
     id = Column(Integer, nullable=False, primary_key=True, autoincrement=True)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+    create_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()"))

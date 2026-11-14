@@ -30,14 +30,16 @@ def get_user(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Could not find user with id {}'.format(id))
     return user
 
-@app.post("/users")
-def create_user():
-    # Define request using UserCreate schema
-    # Extract password
-    # Hash the password
-    # Send password back to the request
-    # Send request
-    pass
+@app.post("/users", status_code=status.HTTP_201_CREATED)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    user.password = utils.hash(user.password) # Exctract and hash passwd
+    new_user = models.User(**user.model_dump())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return {
+        new_user
+    }
 
 if __name__ == "__main__":
     system("python -m uvicorn main:app --reload --port 8089")

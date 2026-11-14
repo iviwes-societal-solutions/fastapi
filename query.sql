@@ -24,5 +24,5 @@
 
 
 -- INSERT INTO users(first_name, second_name, last_name, id_number, email, cellphone, password)
--- VALUES ('TestUser2', 'Secondname', 'UsersSurname', '0987654321234', 'test_user2@devs.com', '0612345789', 'password_123');
+-- VALUES ('TestUser2', 'Secondname', 'UsersSurname', '0987654321234', 'test_user2@devs.com', '0612345789', 'password_123') RETURNING *;
 SELECT * FROM users;

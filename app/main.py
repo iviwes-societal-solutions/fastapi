@@ -16,21 +16,21 @@ def health():
     }
 
 
-@app.get("/users")
+@app.get("/users", response_model=List[schemas.UserPrint])
 def get_users(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
     if not users:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Users not found')
     return users
 
-@app.get("/users/{id}")
+@app.get("/users/{id}", response_model=schemas.UserPrint)
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Could not find user with id {}'.format(id))
     return user
 
-@app.post("/users", status_code=status.HTTP_201_CREATED)
+@app.post("/users", status_code=status.HTTP_201_CREATED)#, response_model=schemas.UserPrint)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     user.password = utils.hash(user.password) # Exctract and hash passwd
     new_user = models.User(**user.model_dump())

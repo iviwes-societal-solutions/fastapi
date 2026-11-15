@@ -9,3 +9,10 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     create_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()"))
+
+class Post(Base):
+    __tablename__ = 'posts'
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    title = Column(String, nullable=False)
+    content = Column(String, nullable=False)
+    create_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()"))
